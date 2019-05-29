@@ -14,7 +14,7 @@ class ParsedownExtra extends Parsedown
 {
     # ~
 
-    const version = '0.7.6';
+    const version = '0.7.7';
 
     # ~
 
@@ -416,18 +416,14 @@ class ParsedownExtra extends Parsedown
             }
         }
 
+        //  Add rel-nofollow to all externals links
         if (
-            ! $this->followWhiteList ||
-            ($this->followWhiteList && array_search($this->getDomain($Link['element']['attributes']['href']), $this->followWhiteList) === false)
-        ) {
-            if ($relAttributeSetted == false) {
-                //  Add rel-nofollow to all externals links
-                if (preg_match('/http(s?)\:\/\//i', $Link['element']['attributes']['href'])) {
-                    $Link['element']['attributes'] += $this->parseAttributeData(sprintf(':%s', 'rel="nofollow"'));
-                }
-            }
+            $relAttributeSetted === false &&
+            $this->notAllowedLink($Link['element']['attributes']['href'])
+        )
+        {
+            $Link['element']['attributes'] += $this->parseAttributeData(sprintf(':%s', 'rel="nofollow"'));
         }
-
 
         return $Link;
     }
@@ -664,6 +660,19 @@ class ParsedownExtra extends Parsedown
         if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
             return $regs['domain'];
         }
+        return false;
+    }
+
+    protected function notAllowedLink($url)
+    {
+        if (
+            preg_match('/http(s?)\:\/\//i', $url) &&
+            (! $this->followWhiteList ||
+                ($this->followWhiteList && array_search($this->getDomain($url), $this->followWhiteList) === false)))
+        {
+            return true;
+        }
+
         return false;
     }
 }
