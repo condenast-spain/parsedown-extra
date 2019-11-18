@@ -14,7 +14,7 @@ class ParsedownExtra extends Parsedown
 {
     # ~
 
-    const version = '0.7.7';
+    const version = '0.7.8';
 
     # ~
 
@@ -71,14 +71,10 @@ class ParsedownExtra extends Parsedown
 
         if (preg_match('/[ ]*{('.$this->regexAttribute.'+)}[ ]*$/', $Block['element']['text'], $matches, PREG_OFFSET_CAPTURE))
         {
-            $span = null;
             $attributeString = $matches[1][0];
             $textWithoutFinalClass = substr($Block['element']['text'], 0, $matches[0][1]);
-            if (preg_match('/%%(?=\S)(.+?)(?<=\S)%%/', $Block['element']['text'], $matchesNew)) {
-                $span = $matchesNew[0];
-            }
 
-            if (!$span || ($span && substr($textWithoutFinalClass, -1) != '%')) {
+            if (substr($textWithoutFinalClass, -1) != '%' && substr($textWithoutFinalClass, -1) != ')' && substr($textWithoutFinalClass, -1) != '*' ) {
                 $Block['element']['attributes'] = $this->parseAttributeData($attributeString);
                 $Block['element']['text'] = substr($Block['element']['text'], 0, $matches[0][1]);
             }
